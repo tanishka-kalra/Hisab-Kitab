@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bootstrap Table Example</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .form-container {
+            max-width: 600px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+
+        }
+
+        .filter-container {
+            display: flex;
+            align-items: center;
+        }
+
+        /* Add margin at the bottom to move the buttons slightly above */
+        .pagination-container {
+            margin-bottom: 100px;
+            /* Adjust this value to control how far up the buttons move */
+        }
+
+        .filter-container>div {
+            margin-right: 1rem;
+        }
+
+        .filter-container>div:last-child {
+            margin-right: 0;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #filterbyname,
+        #filterondate,
+        #filteronstatus {
+            width: 250px;
+            padding: 5px;
+            font-size: 14px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            display: block;
+            margin-bottom: 5px;
+            box-sizing: border-box;
+        }
+    </style>
+    <script>
+        var counter = 0;
+        
+        var isfilter = false;
+        function hello() {
+            lower=counter*25+1;
+            upper=(25*counter)+25;
+            
+            dt = {
+                'upper':upper,
+                'lower':lower
+            }
+            
+            document.getElementById('editform').style.display = 'none';
+            $.ajax({
+                url: 'view',
+                type: 'POST',
+                
+                data:dt,
+                success: function (response) {
+                    $('#datatable tbody').empty();
+
+
+
+                    for (let i = 0; i < response.length; i++) {
+                        var data = response[i];
+
+                        let s = "<tr><td>" + data[2] + "</td><td>" + data[3] + "</td><td>" + data[4] + "</td><td>" + data[5] + "</td><td>" + setDate(data[6]) + "</td><td>" + data[7] + "</td><td>" + data[8] + "</td><td><button type='button' onclick='editData(\"" + data[1] + "\")'>Edit</button></td></tr>";
+
+                        $('#datatable tbody').append(s);
+                    }
+                    document.getElementById("indexing").textContent="Showing data "+lower+"-"+upper+" on this page";
+                }
+
+                
+        })
+        }
+            
+            
+        
+        function setName(name) {
+            const dropdown = document.getElementById("name")
+            const options = document.createElement('option')
+            options.value = data[1];
+            options.text = data[1];
+            dropdown.append(options);
+        }
+        function setDate(date) {
+            const dateObject = new Date(date);
+
+
+            const year = dateObject.getFullYear();
+            const month = String(dateObject.getMonth() + 1).padStart(2, '0'); // Months are zero-based in JS
+            const day = String(dateObject.getDate()).padStart(2, '0'); // Pad the day with 0 if needed
+
+            const formattedDate = `${year}-${month}-${day}`;
+            return formattedDate;
+            // const dateInput = document.getElementById("date")
+            // dateInput.value=formattedDate;
+
+        }
+
+        function editData(id) {
+            let dt = {
+                id: id
+            }
+            
+            $.ajax({
+                url: 'edit_data',
+                type: 'POST',
+
+                data: dt,
+                success: function (response) {
+                    data = response[0];
+                    
+                    document.getElementById("view-page").style.display = "none";
+                    document.getElementById("editform").style.display = "block";
+                    document.getElementById("trans_id").value = data[0];
+                    setName(data[1]);
+                    document.getElementById("name").value = data[1];
+                    document.getElementById("amount").value = data[2];
+                    document.getElementById("mobile").value = data[3];
+                    document.getElementById("location").value = data[4];
+                    document.getElementById("date").value = setDate(data[5]);
+                    document.getElementById("notes").value = data[6];
+                    document.getElementById("status").checked = data[7];
+                }
+
+            });
+
+        }
+        function editDetails() {
+            let trans_id = document.getElementById("trans_id").value;
+            let new_notes = document.getElementById("notes").value;
+            let new_status = document.querySelector('input[name="status"]:checked').value;
+            dt = {
+                trans_id: trans_id,
+                new_notes: new_notes,
+                new_status: new_status
+            }
+            $.ajax({
+                url: 'update_data',
+                type: 'POST',
+
+                data: dt,
+                success: function (response) {
+                    alert(response);
+                    window.location.replace("/");
+                }
+
+            });
+
+        }
+        function ApplyFilter() {
+           
+            counter = 0;
+            var name = -1;
+
+            name = document.getElementById('filtername').value;
+            var date = document.getElementById('filterdate').value;
+
+
+            var status = document.querySelectorAll('input[name="filterstatus"]');
+            var selStatus = '';
+            for (const s of status) {
+                if (s.checked) {
+                    selStatus = s.value;
+                    break;
+                }
+            }
+
+            if (name != -1 || selStatus != '' || date != '') {
+                isfilter = true;
+                dt = {
+                'name': name,
+                'date': date,
+                'status': selStatus,
+
+            }
+            sendData('viewonfilter',dt);
+            }
+            else {
+                isfilter = false;
+            }
+
+
+
+
+           
+
+        }
+        function sendData(req_url,dt=null) {
+            alert("send data chlgya");
+            var lower=counter*25+1;
+            var upper=(25*(counter+1));
+            console.log(dt);
+            bounds = {
+                'upper':upper,
+                'lower':lower,
+                 'dt': dt
+
+            }
+
+            $.ajax({
+                url: req_url,
+                type: 'POST',
+
+                data: bounds,
+                success: function (response) {
+                    
+                    $('#datatable tbody').empty();
+
+
+                    
+                    for (let i = 0; i < response.length; i++) {
+                        var data = response[i];
+                        let s = "<tr><td>" + data[2] + "</td><td>" + data[3] + "</td><td>" + data[4] + "</td><td>" + data[5] + "</td><td>" + setDate(data[6]) + "</td><td>" + data[7] + "</td><td>" + data[8] + "</td><td><button type='button' onclick='editData(\"" + data[1] + "\")'>Edit</button></td></tr>";
+
+                        $('#datatable tbody').append(s);
+                    }
+                    
+                    document.getElementById("indexing").textContent="Showing data "+lower+"-"+upper+" on this page";
+                }
+            });
+        }
+        function Previous() {
+
+            counter--;
+            if (counter < 0) {
+                counter = 0;
+                return;
+            }
+            if(isfilter==false){
+                sendData('view')
+            }
+            else 
+            sendData('viewonfilter')
+        }
+        function Next() {
+            counter++;
+            if(isfilter==false){
+                sendData('view')
+            }
+            else 
+            sendData('viewonfilter')
+        }
+        function resetStatus() {
+            var status = document.querySelectorAll('input[name="filterstatus"]');
+            for (const i of status) {
+                i.checked = false;
+
+            }
+        }
+
+    </script>
+</head>
+
+<body onload="hello()">
+    <div class="container mt-5" id="view-page">
+        <h2 class="text-center">Data</h2>
+        <br>
+        <div class="filter-container">
+            <div id="filterbyname">
+                <label for="name" class="form-label">Name</label>&nbsp;
+                <select class="form-select" id="filtername" name="name" required>
+                    <option value="-1">All</option>
+                    {% for i in names %}
+                    <option value="{{i[0]}}">{{i[1]}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            &nbsp;
+            <div id="filterondate">
+                <label for="date" class="form-label">Date</label>
+                <input type="date" class="form-control" id="filterdate" name="date">
+            </div>
+            <div id="filteronstatus">
+                <label class="form-label">Status</label>
+                <div>
+
+                    <input class="form-check-input" type="radio" name="filterstatus" id="pending" value="Pending">
+                    <label class="form-check-label" for="pending">Pending</label>
+
+
+                    <input class="form-check-input" type="radio" name="filterstatus" id="completed" value="Completed">
+                    <label class="form-check-label" for="completed">Completed</label>
+                    &nbsp;&nbsp; &nbsp;&nbsp;
+                    <button type="button" onclick="resetStatus()">reset</button>
+
+
+                </div>
+            </div>
+            <button type="button" onclick="ApplyFilter()">Apply Filter</button>
+        </div>
+        <br><br><br>
+        <table class="table table-striped table-bordered table-hover" id="datatable">
+            <thead class="table-dark">
+                <tr>
+                    <th style="display: none;">Trans Id</th>
+                    <th>Name</th>
+                    <th>Amount</th>
+                    <th>Mobile</th>
+                    <th>Location</th>
+                    <th>Date</th>
+                    <th>Notes</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+    </div>
+    <div class="container mt-5 d-flex justify-content-center">
+        <div class="form-container" id="editform">
+            <h2 class="text-center mb-4">Bootstrap Form Example</h2>
+            <form>
+                <!-- Name - Combobox -->
+                <div class="mb-3">
+                    <label for="name" class="form-label">Name</label>
+                    <select class="form-select" id="name" name="name" disabled>
+
+                    </select>
+                </div>
+                <div class="hidden">
+
+                    <input type="number" class="form-control" id="trans_id" name="trans_id" disabled>
+                </div>
+                <!-- Amount - Number -->
+                <div class="mb-3">
+                    <label for="amount" class="form-label">Amount</label>
+                    <input type="number" class="form-control" id="amount" name="amount" disabled>
+                </div>
+
+                <!-- Mobile - Number -->
+                <div class="mb-3">
+                    <label for="mobile" class="form-label">Mobile</label>
+                    <input type="tel" class="form-control" id="mobile" name="mobile" pattern="[0-9]{10}" disabled>
+                    <small class="form-text text-muted">Enter a 10-digit mobile number.</small>
+                </div>
+
+                <!-- Location - Text -->
+                <div class="mb-3">
+                    <label for="location" class="form-label">Location</label>
+                    <input type="text" class="form-control" id="location" name="location" disabled>
+                </div>
+
+                <!-- Date - Date Picker -->
+                <div class="mb-3">
+                    <label for="date" class="form-label">Date</label>
+                    <input type="date" class="form-control" id="date" name="date" disabled>
+                </div>
+
+                <!-- Notes - Textarea -->
+                <div class="mb-3">
+                    <label for="notes" class="form-label">Notes</label>
+                    <textarea class="form-control" id="notes" name="notes" maxlength="250" rows="3" required></textarea>
+                    <small class="form-text text-muted">Max 250 characters allowed.</small>
+                </div>
+
+                <!-- Status - Radio Buttons -->
+                <div class="mb-3">
+                    <label class="form-label">Status</label>
+                    <div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="status" id="pending" value="Pending"
+                                checked>
+                            <label class="form-check-label" for="pending">Pending</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="status" id="completed" value="Completed">
+                            <label class="form-check-label" for="completed">Completed</label>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="button" class="btn btn-primary w-100" onclick="editDetails()">Update</button>
+            </form>
+        </div>
+    </div>
+    <div class="container mt-5 pagination-container">
+        <div class="d-flex justify-content-between">
+            <!-- Previous button aligned to the left -->
+            <button type="button" class="btn btn-primary" onclick="Previous()">Previous</button>
+
+            <!-- Text indicating the range of data shown, centered -->
+            <p class="text-center mb-0" id="indexing"></p>
+
+            <!-- Next button aligned to the right -->
+            <button type="button" class="btn btn-primary" onclick="Next()">Next</button>
+        </div>
+    </div>
+
+
+</body>
+
+</html>

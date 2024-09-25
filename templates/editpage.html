@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bootstrap Table Example</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .form-container {
+            max-width: 600px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+    <script>
+        function  hello()
+        {
+            document.getElementById("editform").style.display="none";
+        }
+    </script>
+</head>
+
+<body onload="hello()">
+    <div class="container mt-5" id="view-page" >
+        <h2 class="text-center">Bootstrap Table Example</h2>
+        <table class="table table-striped table-bordered table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Age</th>
+                    <th>Location</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th scope="row">1</th>
+                    <td>John Doe</td>
+                    <td>28</td>
+                    <td>New York</td>
+                    <td>Active</td>
+                </tr>
+                <tr>
+                    <th scope="row">2</th>
+                    <td>Jane Smith</td>
+                    <td>34</td>
+                    <td>Los Angeles</td>
+                    <td>Inactive</td>
+                </tr>
+                <tr>
+                    <th scope="row">3</th>
+                    <td>Michael Brown</td>
+                    <td>23</td>
+                    <td>Chicago</td>
+                    <td>Pending</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="container mt-5 d-flex justify-content-center" >
+        <div class="form-container" id ="editform">
+            <h2 class="text-center mb-4">Bootstrap Form Example</h2>
+            <form>
+                <!-- Name - Combobox -->
+                <div class="mb-3">
+                    <label for="name" class="form-label">Name</label>
+                    <select class="form-select" id="name" name="name">
+                        <option value="John Doe">John Doe</option>
+                        <option value="Jane Smith">Jane Smith</option>
+                        <option value="Michael Brown">Michael Brown</option>
+                    </select>
+                </div>
+
+                <!-- Amount - Number -->
+                <div class="mb-3">
+                    <label for="amount" class="form-label">Amount</label>
+                    <input type="number" class="form-control" id="amount" name="amount" required>
+                </div>
+
+                <!-- Mobile - Number -->
+                <div class="mb-3">
+                    <label for="mobile" class="form-label">Mobile</label>
+                    <input type="tel" class="form-control" id="mobile" name="mobile" pattern="[0-9]{10}" required>
+                    <small class="form-text text-muted">Enter a 10-digit mobile number.</small>
+                </div>
+
+                <!-- Location - Text -->
+                <div class="mb-3">
+                    <label for="location" class="form-label">Location</label>
+                    <input type="text" class="form-control" id="location" name="location" required>
+                </div>
+
+                <!-- Date - Date Picker -->
+                <div class="mb-3">
+                    <label for="date" class="form-label">Date</label>
+                    <input type="date" class="form-control" id="date" name="date" required>
+                </div>
+
+                <!-- Notes - Textarea -->
+                <div class="mb-3">
+                    <label for="notes" class="form-label">Notes</label>
+                    <textarea class="form-control" id="notes" name="notes" maxlength="250" rows="3" required></textarea>
+                    <small class="form-text text-muted">Max 250 characters allowed.</small>
+                </div>
+
+                <!-- Status - Radio Buttons -->
+                <div class="mb-3">
+                    <label class="form-label">Status</label>
+                    <div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="status" id="pending" value="Pending" checked>
+                            <label class="form-check-label" for="pending">Pending</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="status" id="completed" value="Completed">
+                            <label class="form-check-label" for="completed">Completed</label>
+                        </div>
+                        
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="btn btn-primary w-100">Submit</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS (Optional) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
