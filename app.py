@@ -15,9 +15,11 @@ def generate_random_string(length=4):
     letters = string.ascii_letters 
     return ''.join(random.choice(letters) for i in range(length))
 
+
 encoded_dictionary={}
 for i in range(0,10):
     encoded_dictionary[str(i)]=generate_random_string()
+
 
 def send_email(user,subj,bdy,file=None):
 	yag = yagmail.SMTP('', '')
